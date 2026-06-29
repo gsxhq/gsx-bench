@@ -40,8 +40,8 @@ Apple M3 Ultra, Go 1.26.1, gsx @ `main`, templ v0.3.1020.
 | --- | --- | --- | --- |
 | Document | **266 ns · 56 B · 2 allocs** | 390 ns · 361 B · 10 | 1412 ns · 642 B · 24 |
 | List (20 rows) | **1489 ns · 80 B · 2 allocs** | 3608 ns · 1912 B · 123 | — |
-| Table (20 children) | **3106 ns · 1682 B · 22 allocs** | 4833 ns · 4806 B · 183 | — |
-| Page (realistic, class-heavy) | **5632 ns · 2255 B · 62 allocs** | 6686 ns · 4967 B · 204 allocs | — |
+| Table (20 children) | **2255 ns · 1634 B · 21 allocs** | 4945 ns · 4806 B · 183 | — |
+| Page (realistic, class-heavy) | **4699 ns · 2207 B · 61 allocs** | 6701 ns · 4967 B · 204 allocs | — |
 | Piped (40 filters) | 1870 ns · 400 B · 42 allocs | — | — |
 
 gsx beats templ on every shared scenario — most dramatically on lists, where its
@@ -49,16 +49,20 @@ inline loop is **allocation-flat (2 allocs total for 20 rows)** while templ does
 123, and on the realistic `Page` where gsx is faster with ~half the memory and
 under a third of the allocations.
 
-**`Page` is the headline:** a realistic, class-heavy page renders ~1.2× faster
-than templ at 2255 B / 62 allocs vs 4967 B / 204. Earlier this scenario was the
-one place gsx *lost* (≈10 µs), because every component root with a multi-token
-utility class (`class="rounded border bg-white p-4 shadow-sm"`) ran
-`strings.Fields` + a map-based dedup + `strings.Join` on every render. That work
-now lives in the configurable `ClassMerger`: a single class source is returned
-verbatim (no tokenize/dedup/join), a lone class token skips the merger entirely,
-and the default merge dedupes in place without a map — so the realistic page
-dropped from ~10 µs / 122 allocs to ~5.6 µs / 62. `Page` was the gate for that
-work; it now guards against regressing it.
+**`Page` is the headline:** a realistic, class-heavy page renders ~1.4× faster
+than templ at 2207 B / 61 allocs vs 4967 B / 204. Earlier this scenario was the
+one place gsx *lost* (≈10 µs / 122 allocs), because the per-component-root
+attribute machinery was wasteful on every render. Two landed fixes closed it:
+
+- **Class merge** moved into the configurable `ClassMerger` — a single class
+  source is returned verbatim (no tokenize/dedup/join), a lone class token skips
+  the merger entirely, and the default merge dedupes in place without a map.
+- **Empty root-attr fast path** — `StyleMerged("","")` and `Attrs.Without` on an
+  empty bag (the common no-fallthrough case) now return immediately instead of
+  building throwaway dedup maps (12× faster on that path, 0 allocs).
+
+Together the realistic page went from ~10 µs / 122 allocs → **4.7 µs / 61**.
+`Page` was the gate for that work; it now guards against regressing it.
 
 ### Document, across destinations
 
