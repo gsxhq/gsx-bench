@@ -32,7 +32,7 @@ func Page(_gsxp PageProps) gsx.Node {
 		if !_gsxp.Attrs.Has("lang") {
 			_gsxgw.S(" lang=\"en\"")
 		}
-		_gsxgw.ClassMerged(_gsxp.Attrs.Class())
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
 		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
 		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
 		_gsxgw.S(">")
@@ -88,7 +88,7 @@ func UserCard(_gsxp UserCardProps) gsx.Node {
 		_gsxgw := gsx.W(_gsxw)
 //line page.gsx:22:2
 		_gsxgw.S("<li class=\"")
-		_gsxgw.Class(gsx.Class("rounded border bg-white p-4 shadow-sm"), gsx.Class(_gsxp.Attrs.Class()))
+		_gsxgw.Class(gsx.DefaultClassMerge, gsx.Class("rounded border bg-white p-4 shadow-sm"), gsx.Class(_gsxp.Attrs.Class()))
 		_gsxgw.S("\"")
 		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
 		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))

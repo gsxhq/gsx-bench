@@ -26,7 +26,7 @@ func List(_gsxp ListProps) gsx.Node {
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:8:2
 		_gsxgw.S("<table")
-		_gsxgw.ClassMerged(_gsxp.Attrs.Class())
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
 		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
 		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
 		_gsxgw.S(">")
@@ -75,7 +75,7 @@ func Card(_gsxp CardProps) gsx.Node {
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:18:2
 		_gsxgw.S("<div class=\"")
-		_gsxgw.Class(gsx.Class("card"), gsx.Class(_gsxp.Attrs.Class()))
+		_gsxgw.Class(gsx.DefaultClassMerge, gsx.Class("card"), gsx.Class(_gsxp.Attrs.Class()))
 		_gsxgw.S("\"")
 		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
 		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
@@ -109,7 +109,7 @@ func Table(_gsxp TableProps) gsx.Node {
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:22:2
 		_gsxgw.S("<section")
-		_gsxgw.ClassMerged(_gsxp.Attrs.Class())
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
 		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
 		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
 		_gsxgw.S(">")
@@ -138,7 +138,7 @@ func Piped(_gsxp PipedProps) gsx.Node {
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:30:2
 		_gsxgw.S("<ul")
-		_gsxgw.ClassMerged(_gsxp.Attrs.Class())
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
 		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
 		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
 		_gsxgw.S(">")
