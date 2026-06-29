@@ -59,7 +59,7 @@ func Buttons(_gsxp ButtonsProps) gsx.Node {
 //line buttons.gsx:11:7
 		for _, l := range labels {
 //line buttons.gsx:12:3
-			_gsxgw.Node(ctx, Button(ButtonProps{Label: l, Attrs: gsx.Attrs{"class": gsx.ClassString(_gsxcm.Merge, gsx.Class(override))}}))
+			_gsxgw.Node(ctx, Button(ButtonProps{Label: l, Attrs: gsx.Attrs{"class": gsx.ClassJoin(gsx.Class(override))}}))
 		}
 		_gsxgw.S("</div>")
 		return _gsxgw.Err()

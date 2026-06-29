@@ -5,7 +5,6 @@ package gsxr
 import (
 	"context"
 	"io"
-	"strconv"
 
 	"github.com/gsxhq/gsx"
 	"github.com/gsxhq/gsx-bench/data"
@@ -27,6 +26,7 @@ func Page(_gsxp PageProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		rows := _gsxp.Rows
 		_gsxgw := gsx.W(_gsxw)
+		var _gsxnum [32]byte
 //line page.gsx:11:2
 		_gsxgw.S("<html")
 		if !_gsxp.Attrs.Has("lang") {
@@ -59,7 +59,7 @@ func Page(_gsxp PageProps) gsx.Node {
 //line page.gsx:13:45
 		_gsxgw.S("<p class=\"mb-4 text-sm text-gray-500\">")
 //line page.gsx:13:83
-		_gsxgw.Text(strconv.FormatInt(int64(len(rows)), 10))
+		_gsxgw.IntInto(_gsxnum[:], int64(len(rows)))
 		_gsxgw.S(" users</p>")
 //line page.gsx:13:106
 		_gsxgw.S("<ul class=\"space-y-2\">")

@@ -1,0 +1,15 @@
+package templr
+
+import (
+	"strconv"
+
+	"github.com/gsxhq/gsx-bench/data"
+)
+
+templ Stats(rows []data.Row) {
+	<table>
+		for _, r := range rows {
+			<tr><td>{ strconv.Itoa(r.ID * 1009) }</td><td>{ strconv.Itoa(len(r.Email)) }</td><td>{ strconv.Itoa(r.ID) }</td></tr>
+		}
+	</table>
+}

@@ -17,6 +17,7 @@ helped the path it targeted without regressing the others.
 | `Table` | component composition: a `Card` child rendered once per row | yes |
 | `Page` | a realistic whole page: full document, nested components, loop, conditional, text, static + dynamic (URL) + boolean attrs, and multi-token utility classes on every component root | yes |
 | `Comments` | escaping-heavy: bodies dense with `< > & " '` stress the HTML text escaper | yes |
+| `Stats` | integer interpolation — a table of computed ints / lengths / ids | yes |
 | `Buttons` | a custom (Tailwind-style) `ClassMerger` resolving conflicting utility classes on every component root — the production class-merge path | yes |
 | `Piped` | the pipeline (`|>`) filter call path | gsx-only (templ has no `|>`) |
 
@@ -94,21 +95,20 @@ intrinsic allocations, fewer destination writes).
 
 | scenario (Pooled) | gsx | templ |
 | --- | --- | --- |
+| Stats ×20, integer interpolation | **1.2 µs · 64 B · 2 allocs** | 3.6 µs · 1390 B · 134 |
 | Page, rendered in parallel (`b.RunParallel`) | **2.2 µs · 61 allocs** | 3.4 µs · 204 |
-| Buttons ×20, conflict-resolving merger | **12.3 µs · 141 allocs** | 13.3 µs · 203 |
+| Buttons ×20, conflict-resolving merger | **7.4 µs · 181 allocs** | 7.6 µs · 203 |
 
-gsx keeps its lead under concurrency (no pool/alloc bottleneck), and stays ahead
-even when a custom `ClassMerger` (a mock stand-in for `tailwind-merge-go`, so the
-bench takes no such dependency) does real conflict resolution on every component
-root.
-
-**One caveat the `Buttons` scenario surfaces:** when a `class={…}` is passed to a
-child component, gsx's generated code merges it **twice** — once on its own while
-building the child's `Attrs`, then again at the child root (`TestButtonsMergerCalls`
-shows 40 merger calls for 20 buttons vs templ's 20). With a cheap or moderate
-merger this is invisible (gsx still wins above); with a heavy real-Tailwind merger
-it can erase the lead. The fix — pass fallthrough classes raw and merge once at the
-root — is a codegen change tracked separately.
+- **Stats** (integer-heavy table): gsx formats numbers into a per-render scratch
+  buffer and writes the digit bytes directly (no per-number string allocation, no
+  escaping), vs templ's `strconv.Itoa` — ~3× faster, far fewer allocations.
+- **Concurrency**: gsx keeps its lead under contention (no pool/alloc bottleneck).
+- **Buttons**: gsx stays ahead even when a custom `ClassMerger` (a mock stand-in
+  for `tailwind-merge-go`, so the bench takes no such dependency) resolves
+  conflicting utilities on every component root. A `class={…}` forwarded to a
+  child is merged **exactly once** — `TestButtonsMergerCalls` confirms gsx and
+  templ both invoke the merger 20 times for 20 buttons. (Earlier gsx merged
+  forwarded classes twice — 40 calls — which is now fixed.)
 
 ## What the profile says
 
@@ -128,7 +128,12 @@ Pooled runs show:
   to dominate `Page` (`strings.Fields` + a map-based dedup + `strings.Join` per
   render) and made gsx lose. The merge now lives in the `ClassMerger`: single
   source returned verbatim, lone token skips the merger, default dedup is
-  map-free. `Page` fell from ~10 µs / 122 allocs to ~5.6 µs / 62.
+  map-free. `Page` fell from ~10 µs / 122 allocs to ~5.6 µs / 62. A class
+  forwarded to a child component is also merged exactly once now (was twice).
+- **Numeric interpolation — fixed.** `{ n }` for int/uint/float used to allocate
+  a `strconv.Format*` string per value and run it through the escaper. It now
+  formats into a per-render scratch buffer (`gw.IntInto`) and writes the bytes
+  directly — `Stats` is 2 allocs total regardless of how many integers it renders.
 - **Composition allocates per child** — `Table`'s remaining allocs are the lazy
   node closure each `<Card/>` builds (props captured + boxed through `Node`).
   Removing it was prototyped (a generated carrier type + a generic render helper,
