@@ -17,6 +17,7 @@ helped the path it targeted without regressing the others.
 | `Table` | component composition: a `Card` child rendered once per row | yes |
 | `Page` | a realistic whole page: full document, nested components, loop, conditional, text, static + dynamic (URL) + boolean attrs, and multi-token utility classes on every component root | yes |
 | `Comments` | escaping-heavy: bodies dense with `< > & " '` stress the HTML text escaper | yes |
+| `Buttons` | a custom (Tailwind-style) `ClassMerger` resolving conflicting utility classes on every component root — the production class-merge path | yes |
 | `Piped` | the pipeline (`|>`) filter call path | gsx-only (templ has no `|>`) |
 
 **Destination** — where the bytes go. This matters more than it looks:
@@ -88,6 +89,26 @@ The architectural difference behind it: gsx renders by streaming fragments
 directly to your `io.Writer` (intrinsic cost: a stack-allocated writer + the lazy
 node closure); templ renders into its own pooled buffer and flushes once (more
 intrinsic allocations, fewer destination writes).
+
+### Concurrency & a custom (Tailwind-style) merger
+
+| scenario (Pooled) | gsx | templ |
+| --- | --- | --- |
+| Page, rendered in parallel (`b.RunParallel`) | **2.2 µs · 61 allocs** | 3.4 µs · 204 |
+| Buttons ×20, conflict-resolving merger | **12.3 µs · 141 allocs** | 13.3 µs · 203 |
+
+gsx keeps its lead under concurrency (no pool/alloc bottleneck), and stays ahead
+even when a custom `ClassMerger` (a mock stand-in for `tailwind-merge-go`, so the
+bench takes no such dependency) does real conflict resolution on every component
+root.
+
+**One caveat the `Buttons` scenario surfaces:** when a `class={…}` is passed to a
+child component, gsx's generated code merges it **twice** — once on its own while
+building the child's `Attrs`, then again at the child root (`TestButtonsMergerCalls`
+shows 40 merger calls for 20 buttons vs templ's 20). With a cheap or moderate
+merger this is invisible (gsx still wins above); with a heavy real-Tailwind merger
+it can erase the lead. The fix — pass fallthrough classes raw and merge once at the
+root — is a codegen change tracked separately.
 
 ## What the profile says
 

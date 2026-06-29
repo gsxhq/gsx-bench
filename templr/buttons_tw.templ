@@ -1,0 +1,15 @@
+package templr
+
+import "github.com/gsxhq/gsx-bench/mergemock"
+
+templ Button(label, override string) {
+	<button class={ mergemock.Merge([]string{"px-4 py-2 bg-blue-500 text-white rounded font-medium", override}) }>{ label }</button>
+}
+
+templ Buttons(labels []string, override string) {
+	<div>
+		for _, l := range labels {
+			@Button(l, override)
+		}
+	</div>
+}
