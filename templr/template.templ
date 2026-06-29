@@ -1,0 +1,18 @@
+package templr
+
+import "github.com/gsxhq/gsx-bench/data"
+
+// Render mirrors a-h/templ's own benchmark template
+// (benchmarks/templ/template.templ) so the gsx<->templ comparison renders the
+// same HTML. The only change is sourcing Person from the shared data package.
+templ Render(p data.Person) {
+	<div>
+		<h1>{ p.Name }</h1>
+		<div style="font-family: 'sans-serif'" id="test" data-contents={ `something with "quotes" and a <tag>` }>
+			<div>email:<a href={ templ.URL("mailto: " + p.Email) }>{ p.Email }</a></div>
+		</div>
+	</div>
+	<hr noshade?={ true }/>
+	<hr optionA optionB?={ true } optionC="other" optionD?={ false }/>
+	<hr noshade/>
+}
