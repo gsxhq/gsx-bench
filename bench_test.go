@@ -34,8 +34,9 @@ import (
 )
 
 var (
-	person = data.Person{Name: "Luiz Bonfa", Email: "luiz@example.com"}
-	rows   = data.Rows(20)
+	person   = data.Person{Name: "Luiz Bonfa", Email: "luiz@example.com"}
+	rows     = data.Rows(20)
+	comments = data.Comments(20)
 )
 
 // goTemplate is the html/template equivalent of the Document scenario, copied
@@ -140,6 +141,7 @@ var scenarios = []struct {
 	{"List", gsxRender(gsxr.List(gsxr.ListProps{Rows: rows})), templRender(templr.List(rows))},
 	{"Table", gsxRender(gsxr.Table(gsxr.TableProps{Rows: rows})), templRender(templr.Table(rows))},
 	{"Page", gsxRender(gsxr.Page(gsxr.PageProps{Rows: rows})), templRender(templr.Page(rows))},
+	{"Comments", gsxRender(gsxr.Comments(gsxr.CommentsProps{Items: comments})), templRender(templr.Comments(comments))},
 }
 
 func TestScenariosAgree(t *testing.T) {

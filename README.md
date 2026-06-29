@@ -16,6 +16,7 @@ helped the path it targeted without regressing the others.
 | `List` | `for`-range loop + repeated text + inline `if`, over 20 rows | yes |
 | `Table` | component composition: a `Card` child rendered once per row | yes |
 | `Page` | a realistic whole page: full document, nested components, loop, conditional, text, static + dynamic (URL) + boolean attrs, and multi-token utility classes on every component root | yes |
+| `Comments` | escaping-heavy: bodies dense with `< > & " '` stress the HTML text escaper | yes |
 | `Piped` | the pipeline (`|>`) filter call path | gsx-only (templ has no `|>`) |
 
 **Destination** — where the bytes go. This matters more than it looks:
@@ -42,6 +43,7 @@ Apple M3 Ultra, Go 1.26.1, gsx @ `main`, templ v0.3.1020.
 | List (20 rows) | **1489 ns · 80 B · 2 allocs** | 3608 ns · 1912 B · 123 | — |
 | Table (20 children) | **2255 ns · 1634 B · 21 allocs** | 4945 ns · 4806 B · 183 | — |
 | Page (realistic, class-heavy) | **4699 ns · 2207 B · 61 allocs** | 6701 ns · 4967 B · 204 allocs | — |
+| Comments (escaping-heavy) | **3690 ns · 32 B · 1 alloc** | 6508 ns · 9074 B · 143 allocs | — |
 | Piped (40 filters) | 1870 ns · 400 B · 42 allocs | — | — |
 
 gsx beats templ on every shared scenario — most dramatically on lists, where its
@@ -96,6 +98,11 @@ Pooled runs show:
   free.
 - **Inline loops are allocation-flat** — `List` is 2 allocs whether it renders 1
   row or 20.
+- **Text escaping is allocation-free** — `Comments` (entity-dense bodies) is 1
+  alloc / 32 B for gsx vs 143 / 9 KB for templ. gsx's escaper (a `strings.Replacer`
+  port of `html/template`) writes safe runs straight to the output and only
+  diverts for the rare entity, so escaping never allocates. A strength, not a
+  target.
 - **Class merging — fixed.** Multi-token utility classes on component roots used
   to dominate `Page` (`strings.Fields` + a map-based dedup + `strings.Join` per
   render) and made gsx lose. The merge now lives in the `ClassMerger`: single

@@ -25,6 +25,26 @@ type Row struct {
 // page templates compute an identical dynamic URL attribute.
 func (r Row) Href() string { return fmt.Sprintf("/users/%d", r.ID) }
 
+// Comment is the model for the escaping-heavy scenario: realistic
+// user-generated content whose bodies carry characters that must be
+// HTML-escaped (<, >, &, ", '), stressing the text escaper.
+type Comment struct {
+	Author string
+	Body   string
+}
+
+// Comments builds n deterministic comments with escape-triggering bodies.
+func Comments(n int) []Comment {
+	cs := make([]Comment, n)
+	for i := range cs {
+		cs[i] = Comment{
+			Author: fmt.Sprintf("user <%d>", i+1),
+			Body:   `He said "use <div> & <span>" — it's 'better' than R&D <b>tags</b> 5 > 3 & 2 < 4`,
+		}
+	}
+	return cs
+}
+
 // Rows builds n deterministic rows (no time/random, so results are stable).
 func Rows(n int) []Row {
 	rows := make([]Row, n)

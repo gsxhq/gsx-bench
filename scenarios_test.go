@@ -36,3 +36,10 @@ func BenchmarkPageGSXPooled(b *testing.B) {
 	pooled(b, gsxRender(gsxr.Page(gsxr.PageProps{Rows: rows})))
 }
 func BenchmarkPageTemplPooled(b *testing.B) { pooled(b, templRender(templr.Page(rows))) }
+
+// Comments — escaping-heavy: bodies full of <, >, &, ", ' stress the HTML text
+// escaper (gsx's strings.Replacer port of html/template) vs templ's escaper.
+func BenchmarkCommentsGSXPooled(b *testing.B) {
+	pooled(b, gsxRender(gsxr.Comments(gsxr.CommentsProps{Items: comments})))
+}
+func BenchmarkCommentsTemplPooled(b *testing.B) { pooled(b, templRender(templr.Comments(comments))) }
