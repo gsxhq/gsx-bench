@@ -1,0 +1,27 @@
+package templr
+
+import "github.com/gsxhq/gsx-bench/data"
+
+// List, Card, and Table mirror the gsx scenarios so each renders the same HTML.
+
+templ List(rows []data.Row) {
+	<table>
+		for _, r := range rows {
+			<tr><td>{ r.Name }</td><td>{ r.Email }</td><td>{ r.Role }if !r.Active {
+				<em>(inactive)</em>
+			}</td></tr>
+		}
+	</table>
+}
+
+templ Card(r data.Row) {
+	<div class="card"><h3>{ r.Name }</h3><p>{ r.Email } — { r.Role }</p></div>
+}
+
+templ Table(rows []data.Row) {
+	<section>
+		for _, r := range rows {
+			@Card(r)
+		}
+	</section>
+}

@@ -5,3 +5,6 @@
 
 # Editor/OS noise
 .DS_Store
+
+# Profiling output
+/prof/
