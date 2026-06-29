@@ -28,3 +28,11 @@ func BenchmarkTableTemplPooled(b *testing.B) { pooled(b, templRender(templr.Tabl
 func BenchmarkPipedGSXPooled(b *testing.B) {
 	pooled(b, gsxRender(gsxr.Piped(gsxr.PipedProps{Rows: rows})))
 }
+
+// Page — the realistic "whole page": nested components, loop, conditional, text,
+// static+dynamic+boolean attrs, and heavy multi-token utility classes through
+// the class-merge path. The closest scenario to a real server render.
+func BenchmarkPageGSXPooled(b *testing.B) {
+	pooled(b, gsxRender(gsxr.Page(gsxr.PageProps{Rows: rows})))
+}
+func BenchmarkPageTemplPooled(b *testing.B) { pooled(b, templRender(templr.Page(rows))) }

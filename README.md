@@ -15,6 +15,7 @@ helped the path it targeted without regressing the others.
 | `Document` | nested elements, text, a `mailto:` URL attr, an escape-requiring attr value, void/boolean attrs (a faithful port of templ's own benchmark template) | yes |
 | `List` | `for`-range loop + repeated text + inline `if`, over 20 rows | yes |
 | `Table` | component composition: a `Card` child rendered once per row | yes |
+| `Page` | a realistic whole page: full document, nested components, loop, conditional, text, static + dynamic (URL) + boolean attrs, and multi-token utility classes on every component root | yes |
 | `Piped` | the pipeline (`|>`) filter call path | gsx-only (templ has no `|>`) |
 
 **Destination** — where the bytes go. This matters more than it looks:
@@ -40,11 +41,23 @@ Apple M3 Ultra, Go 1.26.1, gsx @ `main`, templ v0.3.1020.
 | Document | **272 ns · 56 B · 2 allocs** | 379 ns · 361 B · 10 | 1418 ns · 642 B · 24 |
 | List (20 rows) | **1505 ns · 80 B · 2 allocs** | 3565 ns · 1912 B · 123 | — |
 | Table (20 children) | **4475 ns · 2323 B · 62 allocs** | 4816 ns · 4806 B · 183 | — |
+| Page (realistic, class-heavy) | 10150 ns · 7712 B · 122 allocs | **6600 ns · 4967 B · 204 allocs** | — |
 | Piped (40 filters) | 1920 ns · 400 B · 42 allocs | — | — |
 
-With the buffer a real consumer uses, gsx beats templ on every shared scenario —
-most dramatically on lists, where gsx's inline loop is **allocation-flat (2
-allocs total for 20 rows)** while templ does 123.
+gsx beats templ comfortably on `Document`, `List`, and `Table` — most dramatically
+on lists, where its inline loop is **allocation-flat (2 allocs total for 20
+rows)** while templ does 123.
+
+**But `Page` flips the result:** on a realistic, class-heavy page gsx is ~1.5×
+*slower* than templ despite doing fewer allocations. The cause is the
+class-merge path — every component root with a multi-token utility class
+(`class="rounded border bg-white p-4 shadow-sm"`) currently runs
+`strings.Fields` + a map-based dedup + `strings.Join` on every render. That
+CPU cost dominates on pages with many such components. This is a known
+bottleneck under active optimisation (the merge work is being moved into the
+configurable `ClassMerger`, with a fast path for the common single-source class
+and cache-friendly handling for Tailwind-style mergers). `Page` is the gate for
+that work.
 
 ### Document, across destinations
 
@@ -78,9 +91,15 @@ Pooled runs show:
   already free.
 - **Inline loops are allocation-flat** — `List` is 2 allocs whether it renders 1
   row or 20. This path is already optimal.
+- **Class merging is the biggest lever** — `Page` shows every component root with
+  a multi-token class running `strings.Fields` + a map-based dedup + `strings.Join`
+  per render. On a class-heavy page this is the dominant cost and makes gsx lose
+  to templ. Fix: hand the merger the raw class strings (no pre-split), fast-path
+  the single-source case, and let cache-based mergers (tailwind-merge-go) key on
+  the raw input.
 - **Composition allocates per child** — `Table` is 62 allocs for 20 cards (~3
   each): each `<Card r={r}/>` builds a props value and a node closure that
-  escapes through the `Writer.Node` path. This is the main lever.
+  escapes through the `Writer.Node` path.
 - **Pipeline filters allocate per call** — `Piped` is 42 allocs for 40 filter
   applications; string-transform filters (`upper`) allocate a new string each
   call. Partly inherent, partly improvable.

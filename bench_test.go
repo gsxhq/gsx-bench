@@ -139,6 +139,7 @@ var scenarios = []struct {
 	{"Document", gsxRender(gsxr.Render(gsxr.RenderProps{P: person})), templRender(templr.Render(person))},
 	{"List", gsxRender(gsxr.List(gsxr.ListProps{Rows: rows})), templRender(templr.List(rows))},
 	{"Table", gsxRender(gsxr.Table(gsxr.TableProps{Rows: rows})), templRender(templr.Table(rows))},
+	{"Page", gsxRender(gsxr.Page(gsxr.PageProps{Rows: rows})), templRender(templr.Page(rows))},
 }
 
 func TestScenariosAgree(t *testing.T) {
