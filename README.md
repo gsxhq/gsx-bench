@@ -1,14 +1,6 @@
 # gsx-bench
 
-Runtime render benchmarks for [**gsx**](https://github.com/gsxhq/gsx), compared
-against [**a-h/templ**](https://github.com/a-h/templ), Go's `html/template`, and
-a raw `io.WriteString` floor.
-
-This is a separate module on purpose: gsx's runtime is standard-library-only, and
-we don't want templ (or the code generators) anywhere near gsx's `go.mod`. Here
-gsx is wired via a `replace` directive to the local working tree (`../gsx`), so
-the numbers track `main` as it evolves; templ is pulled from its **published
-module** (origin `main`), never a local checkout.
+Runtime render benchmarks for [**gsx**](https://github.com/gsxhq/gsx), compared against [**a-h/templ**](https://github.com/a-h/templ), Go's `html/template`, and a raw `io.WriteString` floor.
 
 ## Two axes
 
