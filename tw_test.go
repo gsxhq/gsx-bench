@@ -37,11 +37,9 @@ func TestButtonsAgree(t *testing.T) {
 func BenchmarkButtonsGSXPooled(b *testing.B)   { pooled(b, twGSX()) }
 func BenchmarkButtonsTemplPooled(b *testing.B) { pooled(b, twTempl()) }
 
-// TestButtonsMergerCalls exposes the redundant double-merge structurally: gsx
-// merges each fallthrough class twice (once alone when building the child's
-// Attrs bag, once at the child root), so it invokes the merger ~2x per button
-// vs templ's 1x. Cost-independent; this is the gate for the codegen fix that
-// would pass fallthrough classes raw (then gsx should match templ's count).
+// TestButtonsMergerCalls pins the fallthrough class merge count. gsx should
+// merge each caller-provided class exactly once at the child root, matching
+// templ's merger call count for the same 20 buttons.
 func TestButtonsMergerCalls(t *testing.T) {
 	mergemock.Calls.Store(0)
 	_ = renderString(twGSX())
@@ -52,7 +50,7 @@ func TestButtonsMergerCalls(t *testing.T) {
 	templCalls := mergemock.Calls.Load()
 
 	t.Logf("merger calls for 20 buttons — gsx: %d, templ: %d", gsxCalls, templCalls)
-	if gsxCalls <= templCalls {
-		t.Skipf("gsx no longer double-merges (gsx %d <= templ %d) — the codegen fix may have landed; tighten this test", gsxCalls, templCalls)
+	if gsxCalls != templCalls {
+		t.Fatalf("merger call count mismatch: gsx %d, templ %d", gsxCalls, templCalls)
 	}
 }

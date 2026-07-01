@@ -19,7 +19,7 @@ helped the path it targeted without regressing the others.
 | `Comments` | escaping-heavy: bodies dense with `< > & " '` stress the HTML text escaper | yes |
 | `Stats` | integer interpolation — a table of computed ints / lengths / ids | yes |
 | `Buttons` | a custom (Tailwind-style) `ClassMerger` resolving conflicting utility classes on every component root — the production class-merge path | yes |
-| `Piped` | the pipeline (`|>`) filter call path | gsx-only (templ has no `|>`) |
+| `Piped` | the pipeline (`\|>`) filter call path | gsx-only (templ has no `\|>`) |
 
 **Destination** — where the bytes go. This matters more than it looks:
 
@@ -41,20 +41,20 @@ Apple M3 Ultra, Go 1.26.1, gsx @ `main`, templ v0.3.1020.
 
 | scenario | gsx | templ | html/template |
 | --- | --- | --- | --- |
-| Document | **266 ns · 56 B · 2 allocs** | 390 ns · 361 B · 10 | 1412 ns · 642 B · 24 |
-| List (20 rows) | **1489 ns · 80 B · 2 allocs** | 3608 ns · 1912 B · 123 | — |
-| Table (20 children) | **2255 ns · 1634 B · 21 allocs** | 4945 ns · 4806 B · 183 | — |
-| Page (realistic, class-heavy) | **4699 ns · 2207 B · 61 allocs** | 6701 ns · 4967 B · 204 allocs | — |
-| Comments (escaping-heavy) | **3690 ns · 32 B · 1 alloc** | 6508 ns · 9074 B · 143 allocs | — |
-| Piped (40 filters) | 1870 ns · 400 B · 42 allocs | — | — |
+| Document | **270 ns · 56 B · 2 allocs** | 394 ns · 361 B · 10 | 1428 ns · 642 B · 24 |
+| List (20 rows) | **1436 ns · 32 B · 1 alloc** | 3606 ns · 1913 B · 123 | — |
+| Table (20 children) | **2228 ns · 1955 B · 21 allocs** | 4877 ns · 4809 B · 183 | — |
+| Page (realistic, class-heavy) | **4679 ns · 2561 B · 62 allocs** | 6792 ns · 4969 B · 204 allocs | — |
+| Comments (escaping-heavy) | **3640 ns · 32 B · 1 alloc** | 6555 ns · 9078 B · 143 allocs | — |
+| Piped (40 filters) | 1831 ns · 352 B · 41 allocs | — | — |
 
 gsx beats templ on every shared scenario — most dramatically on lists, where its
-inline loop is **allocation-flat (2 allocs total for 20 rows)** while templ does
+inline loop is **allocation-flat (1 alloc total for 20 rows)** while templ does
 123, and on the realistic `Page` where gsx is faster with ~half the memory and
 under a third of the allocations.
 
 **`Page` is the headline:** a realistic, class-heavy page renders ~1.4× faster
-than templ at 2207 B / 61 allocs vs 4967 B / 204. Earlier this scenario was the
+than templ at 2561 B / 62 allocs vs 4969 B / 204. Earlier this scenario was the
 one place gsx *lost* (≈10 µs / 122 allocs), because the per-component-root
 attribute machinery was wasteful on every render. Two landed fixes closed it:
 
@@ -65,7 +65,7 @@ attribute machinery was wasteful on every render. Two landed fixes closed it:
   empty bag (the common no-fallthrough case) now return immediately instead of
   building throwaway dedup maps (12× faster on that path, 0 allocs).
 
-Together the realistic page went from ~10 µs / 122 allocs → **4.7 µs / 61**.
+Together the realistic page went from ~10 µs / 122 allocs → **4.7 µs / 62**.
 `Page` was the gate for that work; it now guards against regressing it.
 
 ### Document, across destinations
@@ -75,11 +75,11 @@ benchmark" is actually the *destination*, not the engine:
 
 | destination | gsx | templ | html/template | raw write |
 | --- | --- | --- | --- | --- |
-| Pooled (warm buffer) | **272 ns · 2 allocs** | 379 ns · 10 | 1418 ns · 24 | — |
-| Discard (engine only) | **186 ns · 2 allocs** | 372 ns · 10 | — | — |
-| Builder (cold, templ-style) | 422 ns · 8 allocs | 417 ns · 11 | 1522 ns · 28 | 53 ns · 1 |
+| Pooled (warm buffer) | **270 ns · 2 allocs** | 394 ns · 10 | 1428 ns · 24 | — |
+| Discard (engine only) | **189 ns · 2 allocs** | 381 ns · 10 | — | — |
+| Builder (cold, templ-style) | 443 ns · 8 allocs | 423 ns · 11 | 1518 ns · 28 | 56 ns · 1 |
 
-Note the **Builder row is a near-tie** (422 vs 417 ns) — and it's the one most
+Note the **Builder row is a near-tie** (443 vs 423 ns) — and it's the one most
 benchmarks publish. That tie is an artifact: gsx streams many small writes
 straight to the destination, so against a `strings.Builder` that nils itself
 every iteration it pays for ~6 buffer regrowths. Move to a warm buffer (Pooled)
@@ -95,9 +95,9 @@ intrinsic allocations, fewer destination writes).
 
 | scenario (Pooled) | gsx | templ |
 | --- | --- | --- |
-| Stats ×20, integer interpolation | **1.2 µs · 64 B · 2 allocs** | 3.6 µs · 1390 B · 134 |
-| Page, rendered in parallel (`b.RunParallel`) | **2.2 µs · 61 allocs** | 3.4 µs · 204 |
-| Buttons ×20, conflict-resolving merger | **7.4 µs · 181 allocs** | 7.6 µs · 203 |
+| Stats ×20, integer interpolation | **1.2 µs · 64 B · 2 allocs** | 3.6 µs · 1391 B · 134 |
+| Page, rendered in parallel (`b.RunParallel`) | **1.7 µs · 62 allocs** | 2.8 µs · 204 |
+| Buttons ×20, conflict-resolving merger | **5.3 µs · 161 allocs** | 7.9 µs · 203 |
 
 - **Stats** (integer-heavy table): gsx formats numbers into a per-render scratch
   buffer and writes the digit bytes directly (no per-number string allocation, no
@@ -117,7 +117,7 @@ Pooled runs show:
 
 - **`gsx.Writer` does not escape** — it's stack-allocated; the writer wrapper is
   free.
-- **Inline loops are allocation-flat** — `List` is 2 allocs whether it renders 1
+- **Inline loops are allocation-flat** — `List` is 1 alloc whether it renders 1
   row or 20.
 - **Text escaping is allocation-free** — `Comments` (entity-dense bodies) is 1
   alloc / 32 B for gsx vs 143 / 9 KB for templ. gsx's escaper (a `strings.Replacer`
@@ -128,7 +128,7 @@ Pooled runs show:
   to dominate `Page` (`strings.Fields` + a map-based dedup + `strings.Join` per
   render) and made gsx lose. The merge now lives in the `ClassMerger`: single
   source returned verbatim, lone token skips the merger, default dedup is
-  map-free. `Page` fell from ~10 µs / 122 allocs to ~5.6 µs / 62. A class
+  map-free. `Page` fell from ~10 µs / 122 allocs to ~4.7 µs / 62. A class
   forwarded to a child component is also merged exactly once now (was twice).
 - **Numeric interpolation — fixed.** `{ n }` for int/uint/float used to allocate
   a `strconv.Format*` string per value and run it through the escaper. It now
@@ -142,7 +142,7 @@ Pooled runs show:
   per-component closure cost (its `Card(r).Render(...)` builds the same capturing
   closure — and templ does *more* per child, 183 allocs on this `Table`). Not a
   competitive gap; not worth the surface.
-- **Pipeline filters allocate per call** — `Piped` is 42 allocs for 40 filter
+- **Pipeline filters allocate per call** — `Piped` is 41 allocs for 40 filter
   applications; a string transform like `upper` must allocate. Inherent.
 
 These per-scenario, per-path numbers are the baseline any future write-path

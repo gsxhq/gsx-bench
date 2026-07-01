@@ -23,15 +23,16 @@ type ButtonProps struct {
 func Button(_gsxp ButtonProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		label := _gsxp.Label
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 //line buttons.gsx:7:2
 		_gsxgw.S("<button class=\"")
-		_gsxgw.Class(_gsxcm.Merge, gsx.Class("px-4 py-2 bg-blue-500 text-white rounded font-medium"), gsx.Class(_gsxp.Attrs.Class()))
+		_gsxgw.Class(_gsxcm.Merge, gsx.Class("px-4 py-2 bg-blue-500 text-white rounded font-medium"), gsx.Class(attrs.Class()))
 		_gsxgw.S("\"")
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line buttons.gsx:7:71
+//line buttons.gsx:8:3
 		_gsxgw.Text(string(label))
 		_gsxgw.S("</button>")
 		return _gsxgw.Err()
@@ -44,22 +45,23 @@ type ButtonsProps struct {
 	Attrs    gsx.Attrs
 }
 
-//line buttons.gsx:10:1
+//line buttons.gsx:12:1
 func Buttons(_gsxp ButtonsProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		labels := _gsxp.Labels
 		override := _gsxp.Override
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
-//line buttons.gsx:11:2
+//line buttons.gsx:13:2
 		_gsxgw.S("<div")
-		_gsxgw.ClassMerged(_gsxcm.Merge, _gsxp.Attrs.Class())
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.ClassMerged(_gsxcm.Merge, attrs.Class())
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line buttons.gsx:11:7
+//line buttons.gsx:14:3
 		for _, l := range labels {
-//line buttons.gsx:12:3
-			_gsxgw.Node(ctx, Button(ButtonProps{Label: l, Attrs: gsx.Attrs{"class": gsx.ClassJoin(gsx.Class(override))}}))
+//line buttons.gsx:15:4
+			_gsxgw.Node(ctx, Button(ButtonProps{Label: l, Attrs: gsx.Attrs{{Key: "class", Value: gsx.ClassJoin(gsx.Class(override))}}}))
 		}
 		_gsxgw.S("</div>")
 		return _gsxgw.Err()

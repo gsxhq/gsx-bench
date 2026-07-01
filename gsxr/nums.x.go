@@ -23,15 +23,16 @@ type StatsProps struct {
 func Stats(_gsxp StatsProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		rows := _gsxp.Rows
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 		var _gsxnum [32]byte
 //line nums.gsx:9:2
 		_gsxgw.S("<table")
-		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, attrs.Class())
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line nums.gsx:9:9
+//line nums.gsx:9:22
 		for _, r := range rows {
 //line nums.gsx:10:3
 			_gsxgw.S("<tr>")

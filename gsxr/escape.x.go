@@ -22,14 +22,15 @@ type CommentsProps struct {
 func Comments(_gsxp CommentsProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		items := _gsxp.Items
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 //line escape.gsx:8:2
 		_gsxgw.S("<section")
-		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, attrs.Class())
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line escape.gsx:8:11
+//line escape.gsx:8:24
 		for _, c := range items {
 //line escape.gsx:9:3
 			_gsxgw.S("<article>")

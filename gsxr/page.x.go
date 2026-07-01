@@ -25,24 +25,25 @@ type PageProps struct {
 func Page(_gsxp PageProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		rows := _gsxp.Rows
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 		var _gsxnum [32]byte
 //line page.gsx:11:2
 		_gsxgw.S("<html")
-		if !_gsxp.Attrs.Has("lang") {
+		if !attrs.Has("lang") {
 			_gsxgw.S(" lang=\"en\"")
 		}
-		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, attrs.Class())
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line page.gsx:11:18
+//line page.gsx:11:31
 		_gsxgw.S("<head>")
-//line page.gsx:11:24
+//line page.gsx:11:37
 		_gsxgw.S("<meta charset=\"utf-8\"/>")
-//line page.gsx:11:47
+//line page.gsx:11:60
 		_gsxgw.S("<title>Users</title></head>")
-//line page.gsx:11:74
+//line page.gsx:11:87
 		_gsxgw.S("<body class=\"bg-gray-50 text-gray-900\">")
 //line page.gsx:12:3
 		_gsxgw.S("<header class=\"border-b bg-white px-6 py-4\">")
@@ -85,36 +86,37 @@ type UserCardProps struct {
 func UserCard(_gsxp UserCardProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		r := _gsxp.R
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 //line page.gsx:22:2
 		_gsxgw.S("<li class=\"")
-		_gsxgw.Class(gsx.DefaultClassMerge, gsx.Class("rounded border bg-white p-4 shadow-sm"), gsx.Class(_gsxp.Attrs.Class()))
+		_gsxgw.Class(gsx.DefaultClassMerge, gsx.Class("rounded border bg-white p-4 shadow-sm"), gsx.Class(attrs.Class()))
 		_gsxgw.S("\"")
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line page.gsx:22:52
+//line page.gsx:22:65
 		_gsxgw.S("<div class=\"flex items-center justify-between\">")
-//line page.gsx:22:99
+//line page.gsx:22:112
 		_gsxgw.S("<div class=\"min-w-0\">")
-//line page.gsx:22:120
+//line page.gsx:22:133
 		_gsxgw.S("<a class=\"font-medium text-gray-900 hover:underline\" href=\"")
 		_gsxgw.URL(string(r.Href()))
 		_gsxgw.S("\">")
-//line page.gsx:22:189
+//line page.gsx:22:202
 		_gsxgw.Text(string(r.Name))
 		_gsxgw.S("</a>")
-//line page.gsx:22:203
+//line page.gsx:22:216
 		_gsxgw.S("<p class=\"truncate text-sm text-gray-500\">")
-//line page.gsx:22:245
+//line page.gsx:22:258
 		_gsxgw.Text(string(r.Email))
 		_gsxgw.S("</p></div>")
-//line page.gsx:22:266
+//line page.gsx:22:279
 		_gsxgw.S("<span class=\"rounded bg-gray-100 px-2 py-1 text-xs font-medium uppercase\">")
-//line page.gsx:22:340
+//line page.gsx:22:353
 		_gsxgw.Text(string(r.Role))
 		_gsxgw.S("</span></div>")
-//line page.gsx:22:363
+//line page.gsx:22:376
 		if !r.Active {
 //line page.gsx:23:3
 			_gsxgw.S("<p class=\"mt-2 text-xs text-amber-600\"")

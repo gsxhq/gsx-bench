@@ -23,14 +23,15 @@ type ListProps struct {
 func List(_gsxp ListProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		rows := _gsxp.Rows
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:8:2
 		_gsxgw.S("<table")
-		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, attrs.Class())
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line scenarios.gsx:8:9
+//line scenarios.gsx:8:22
 		for _, r := range rows {
 //line scenarios.gsx:9:3
 			_gsxgw.S("<tr>")
@@ -72,25 +73,26 @@ type CardProps struct {
 func Card(_gsxp CardProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		r := _gsxp.R
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:18:2
 		_gsxgw.S("<div class=\"")
-		_gsxgw.Class(gsx.DefaultClassMerge, gsx.Class("card"), gsx.Class(_gsxp.Attrs.Class()))
+		_gsxgw.Class(gsx.DefaultClassMerge, gsx.Class("card"), gsx.Class(attrs.Class()))
 		_gsxgw.S("\"")
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line scenarios.gsx:18:20
+//line scenarios.gsx:18:33
 		_gsxgw.S("<h3>")
-//line scenarios.gsx:18:24
+//line scenarios.gsx:18:37
 		_gsxgw.Text(string(r.Name))
 		_gsxgw.S("</h3>")
-//line scenarios.gsx:18:39
+//line scenarios.gsx:18:52
 		_gsxgw.S("<p>")
-//line scenarios.gsx:18:42
+//line scenarios.gsx:18:55
 		_gsxgw.Text(string(r.Email))
 		_gsxgw.S(" — ")
-//line scenarios.gsx:18:58
+//line scenarios.gsx:18:71
 		_gsxgw.Text(string(r.Role))
 		_gsxgw.S("</p></div>")
 		return _gsxgw.Err()
@@ -106,14 +108,15 @@ type TableProps struct {
 func Table(_gsxp TableProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		rows := _gsxp.Rows
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:22:2
 		_gsxgw.S("<section")
-		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, attrs.Class())
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line scenarios.gsx:22:11
+//line scenarios.gsx:22:24
 		for _, r := range rows {
 //line scenarios.gsx:23:3
 			_gsxgw.Node(ctx, Card(CardProps{R: r}))
@@ -135,14 +138,15 @@ type PipedProps struct {
 func Piped(_gsxp PipedProps) gsx.Node {
 	return gsx.Func(func(ctx context.Context, _gsxw io.Writer) error {
 		rows := _gsxp.Rows
+		attrs := _gsxp.Attrs
 		_gsxgw := gsx.W(_gsxw)
 //line scenarios.gsx:30:2
 		_gsxgw.S("<ul")
-		_gsxgw.ClassMerged(gsx.DefaultClassMerge, _gsxp.Attrs.Class())
-		_gsxgw.StyleMerged("", _gsxp.Attrs.Style())
-		_gsxgw.Spread(ctx, _gsxp.Attrs.Without("class", "style"))
+		_gsxgw.ClassMerged(gsx.DefaultClassMerge, attrs.Class())
+		_gsxgw.StyleMerged("", attrs.Style())
+		_gsxgw.Spread(ctx, attrs.Without("class", "style"))
 		_gsxgw.S(">")
-//line scenarios.gsx:30:6
+//line scenarios.gsx:30:19
 		for _, r := range rows {
 //line scenarios.gsx:31:3
 			_gsxgw.S("<li>")
